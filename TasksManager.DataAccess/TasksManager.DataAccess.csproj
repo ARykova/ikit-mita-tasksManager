@@ -5,6 +5,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="System.Data.SqlClient" Version="4.4.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\TasksManager.Entities\TasksManager.Entities.csproj" />
     <ProjectReference Include="..\TasksManager.ViewModel\TasksManager.ViewModel.csproj" />
   </ItemGroup>
 

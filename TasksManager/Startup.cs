@@ -5,8 +5,10 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Swashbuckle.AspNetCore.Swagger;
+using TasksManager.DataAccess.DbImplementation;
 using TasksManager.DataAccess.DbImplementation.Projects;
 using TasksManager.DataAccess.Projects;
+using TasksManager.DataAccess.UnitOfWork;
 using TasksManager.Db;
 
 namespace TasksManager
@@ -29,7 +31,9 @@ namespace TasksManager
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<Db.TasksContext>(options => options.UseSqlServer(Configuration.GetConnectionString("TasksContext")));
-            RegisterQueriesAndCommands(services);
+            RegisterQueriesAndCommands(services, Configuration.GetConnectionString("TasksContext"));
+
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
             // Add framework services.
             services.AddMvc();
 
@@ -41,9 +45,9 @@ namespace TasksManager
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, Db.TasksContext context)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, IUnitOfWork uow)
         {
-            context.Database.Migrate();
+            uow.Migrate();
 
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
@@ -60,13 +64,15 @@ namespace TasksManager
             });
         }
 
-        private void RegisterQueriesAndCommands(IServiceCollection services)
+        private void RegisterQueriesAndCommands(IServiceCollection services, string connectionString)
         {
             services
+                //.AddScoped<IConnectionFactory, ConnectionFactory>(factory=>new ConnectionFactory(connectionString))
                 .AddScoped<IProjectQuery, ProjectQuery>()
                 .AddScoped<IProjectsListQuery, ProjectsListQuery>()
-
                 .AddScoped<ICreateProjectCommand, CreateProjectCommand>()
+                //.AddScoped<IProjectQuery, ProjectQueryDapper>()
+                //.AddScoped<ICreateProjectCommand, CreateProjectDapper>()
                 ;
         }
     }

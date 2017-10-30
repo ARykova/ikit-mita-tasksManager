@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using TasksManager.DataAccess.Projects;
+using TasksManager.DataAccess.UnitOfWork;
 using TasksManager.Db;
 using TasksManager.Entities;
 using TasksManager.ViewModel.Projects;
@@ -8,10 +9,10 @@ namespace TasksManager.DataAccess.DbImplementation.Projects
 {
     public class CreateProjectCommand : ICreateProjectCommand
     {
-        private TasksContext Context { get; }
-        public CreateProjectCommand(TasksContext context)
+        private IUnitOfWork Uow { get; }
+        public CreateProjectCommand(IUnitOfWork uow)
         {
-            Context = context;
+            Uow = uow;
         }
 
         public async Task<ProjectResponse> ExecuteAsync(CreateProjectRequest request)
@@ -21,8 +22,10 @@ namespace TasksManager.DataAccess.DbImplementation.Projects
                 Name = request.Name,
                 Description = request.Description
             };
-            await Context.Projects.AddAsync(project);
-            await Context.SaveChangesAsync();
+
+            Uow.Projects.Add(project);
+            await Uow.CommitAsync();
+
             return new ProjectResponse
             {
                 Id = project.Id,
