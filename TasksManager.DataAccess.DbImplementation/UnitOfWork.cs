@@ -10,13 +10,13 @@ namespace TasksManager.DataAccess.DbImplementation
     {
         private TasksContext Context { get; }
 
-        private readonly IRepository<Project> _projects;
-        public IRepository<Project> Projects => _projects;
+        private readonly IQueryableRepository<Project> _projects;
+        public IQueryableRepository<Project> Projects => _projects;
 
-        public UnitOfWork(TasksContext  context)
+        public UnitOfWork(TasksContext context)
         {
             Context = context;
-            _projects = new EFRepository<Project>(context.Projects);
+            _projects = new EFQueryableRepository<Project, TasksContext>(Context);
         }
 
         public int Commit()

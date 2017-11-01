@@ -1,20 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
 using TasksManager.DataAccess.UnitOfWork;
 using TasksManager.Entities;
 
 namespace TasksManager.DataAccess.DbImplementation
 {
-    public class EFRepository<TEntity> : IRepository<TEntity> where TEntity : DomainObject
+    public class EFRepository<TEntity, TContext> : IRepository<TEntity> 
+        where TEntity : DomainObject 
+        where TContext : DbContext
     {
         private DbSet<TEntity> DbSet { get;}
 
-        public EFRepository(DbSet<TEntity> dbSet)
+        protected TContext Context { get; }
+
+        public EFRepository(TContext context)
         {
-            DbSet = dbSet;
+            Context = context;
+            DbSet = Context.Set<TEntity>();
         }
 
         public void Add(TEntity entity)
@@ -26,5 +28,7 @@ namespace TasksManager.DataAccess.DbImplementation
         {
             return await DbSet.FindAsync(id);
         }
+
+
     }
 }

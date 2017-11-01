@@ -19,27 +19,30 @@ namespace TasksManager.DataAccess.DbImplementation.Projects
 
         public async Task<ProjectResponse> RunAsync(int projectId)
         {
-            var project = await Uow.Projects.FindAsync(projectId);
-            if (project != null)
-            {
-                return new ProjectResponse
-                {
-                    Id = project.Id,
-                    Description = project.Description
-                };
-            }
-            return null;
-            //ProjectResponse response = await Uow.Projects
-            //    .Select(p => new ProjectResponse
+            //var project = await Uow.Projects.FindAsync(projectId);
+            //if (project != null)
+            //{
+            //    return new ProjectResponse
             //    {
-            //        Id = p.Id,
-            //        Name = p.Name,
-            //        Description = p.Description,
-            //        OpenTasksCount = p.Tasks.Count(t => t.Status != Entities.TaskStatus.Completed)
-            //    })
-            //    .FirstOrDefaultAsync(pr => pr.Id == projectId);
+            //        Id = project.Id,
+            //        Name = project.Name,
+            //        Description = project.Description,
+            //        OpenTasksCount = project.Tasks.Count(t => t.Status != Entities.TaskStatus.Completed)
+            //    };
+            //}
+            //return null;
 
-            //return response;
+            ProjectResponse response = await Uow.Projects
+                .Select(p => new ProjectResponse
+                {
+                    Id = p.Id,
+                    Name = p.Name,
+                    Description = p.Description,
+                    OpenTasksCount = p.Tasks.Count(t => t.Status != Entities.TaskStatus.Completed)
+                })
+                .FirstOrDefaultAsync(pr => pr.Id == projectId);
+
+            return response;
         }
     }
 }

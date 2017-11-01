@@ -5,7 +5,7 @@ namespace TasksManager.DataAccess.UnitOfWork
 {
     public interface IUnitOfWork
     {
-        IRepository<Project> Projects { get; }
+        IQueryableRepository<Project> Projects { get; }
 
         void Migrate();
 
